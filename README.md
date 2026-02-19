@@ -87,4 +87,4 @@ curl -X POST http://127.0.0.1:8000/chat \
 
 ## License
 
-This project was created by Kingsford Sunday Ntim and is open source and available under the [MIT License](LICENSE).
+This project was created by [Kingsford Sunday Ntim](https://www.linkedin.com/in/kingsfordntim)  and is open source and available under the [MIT License](LICENSE).
