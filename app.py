@@ -187,7 +187,7 @@ app.add_middleware(
 async def root():
     """Health-check / welcome endpoint."""
     return {
-        "message": "Welcome to the Study Bot API!",
+        "message": "Welcome to the Study Bot App!",
     }
 
 
