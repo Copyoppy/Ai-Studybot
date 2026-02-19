@@ -9,3 +9,6 @@ Studybot.docx
 Studybot.pdf
 .DS_Store
 
+# Microsoft Office temporary files
+~$*.docx
+
