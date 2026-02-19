@@ -2,6 +2,12 @@
 
 An intelligent study assistant API built with **FastAPI**, **LangChain**, **Groq (Llama 3.3)**, and **MongoDB**. StudyBot answers academic questions with clarity, provides real-world examples, and maintains conversation history for personalized learning sessions.
 
+## Links
+
+- GitHub Repository: https://github.com/Copyoppy/Ai-Studybot
+- Hosted API (Render): https://ai-studybot.onrender.com/
+- API Docs (Swagger UI): https://ai-studybot.onrender.com/docs
+
 ## Features
 
 - **AI-Powered Responses** — Uses Llama 3.3 70B via Groq for fast, high-quality answers
@@ -30,8 +36,8 @@ An intelligent study assistant API built with **FastAPI**, **LangChain**, **Groq
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/<your-username>/studybot.git
-   cd studybot
+   git clone https://github.com/Copyoppy/Ai-Studybot.git
+   cd Ai-Studybot
    ```
 
 2. **Create a virtual environment**
@@ -84,6 +90,43 @@ curl -X POST http://127.0.0.1:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"session_id": "user1", "message": "Explain photosynthesis"}'
 ```
+
+## Memory Implementation (Conversation History)
+
+StudyBot uses **session-based conversation memory** backed by MongoDB. Each request to `POST /chat` can include a `session_id`. The API loads recent messages for that session and replays them into the prompt so the model can answer with context.
+
+### How memory is stored
+
+Each chat message is saved as a MongoDB document containing:
+
+- `session_id` — groups messages into a single conversation
+- `role` — either `human` (user) or `ai` (assistant)
+- `content` — the message text
+- `timestamp` — stored in UTC
+
+On every successful `/chat` call, the API saves:
+
+- the user message (`role="human"`)
+- the assistant response (`role="ai"`)
+
+### How memory is retrieved (bounded context)
+
+To keep prompts efficient, the API only loads the most recent messages per session (default: last **10** messages via `MAX_HISTORY_MESSAGES`). Messages are fetched newest-first, then reversed so the final context is chronological (oldest → newest).
+
+### How memory is applied to the model
+
+Stored MongoDB records are converted into LangChain message objects:
+
+- `human` → `HumanMessage`
+- `ai` → `AIMessage`
+
+Then the final message list passed to the model is built like:
+
+1. `SystemMessage(SYSTEM_PROMPT)` (defines StudyBot behavior)
+2. prior session messages (history)
+3. the new user question (`HumanMessage(request.message)`)
+
+This is the core “memory” mechanism: **retrieve → convert → prepend system prompt → append new message → invoke model**.
 
 ## License
 
