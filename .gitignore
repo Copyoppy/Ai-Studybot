@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+.venv*/
+venv/
+*.egg-info/
+.vscode/
+Studybot.docx
+Studybot.pdf
+.DS_Store
+
